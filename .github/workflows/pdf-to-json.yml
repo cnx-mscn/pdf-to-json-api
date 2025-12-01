@@ -1,0 +1,35 @@
+
+name: PDF to JSON API
+
+on:
+  workflow_dispatch:
+    inputs:
+      pdf_base64:
+        description: 'Base64 encoded PDF content'
+        required: true
+
+jobs:
+  convert-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install pdfplumber
+
+      - name: Run PDF to JSON script
+        run: |
+          echo "${{ github.event.inputs.pdf_base64 }}" | python pdf_to_json.py > output.json
+
+      - name: Upload JSON result
+        uses: actions/upload-artifact@v3
+        with:
+          name: pdf-json-result
+          path: output.json
